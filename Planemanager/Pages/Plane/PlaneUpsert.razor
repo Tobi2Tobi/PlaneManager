@@ -1,0 +1,100 @@
+﻿@page "/plane/create"
+@page "/plane/edit/{id:int}"
+@using PM.Buisness.Repositories.IRepositories;
+@using PM.Models;
+@inject IPlaneRepositorie planeRepository
+@inject NavigationManager navigationManager
+
+<div class="row my-2">
+    <h3 class="card-title text-primary mb-3 ml-3">@Title Plane</h3>
+
+    <div class="col-10">
+        @if (IsLoading)
+        {
+            <div class="text-center">
+                <img src="/images/loading.gif" />
+            </div>
+        }
+        else
+        {
+
+            <EditForm Model="@Plane" OnValidSubmit="@UpsertObj">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="row">
+                    <div class="form-group col-4 border p-3 mt-4">
+                        <label>Name</label>
+                        <InputText @bind-Value="@Plane.Name" class="form-control"></InputText>
+                        <ValidationMessage For="()=>Plane.Name"></ValidationMessage>
+                        <label>Seats</label>
+                        <InputNumber @bind-Value="@Plane.Seats" class="form-control"></InputNumber>
+                        <ValidationMessage For="()=>Plane.Seats"></ValidationMessage>
+                        <label>IsActive</label>
+                        <InputCheckbox @bind-Value="@Plane.IsActive" class="form-check"></InputCheckbox>
+                        <ValidationMessage For="()=>Plane.IsActive"></ValidationMessage>
+                    </div>
+                    <div class="form-group py-2">
+                        <button class="btn btn-primary">@Title</button>
+                        <NavLink href="plane" class="btn btn-secondary">Back to Index</NavLink>
+                    </div>
+                </div>
+            </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private PlaneDTO Plane { get; set; } = new PlaneDTO();
+    private string Title { get; set; } = "Create";
+    public bool IsLoading { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (Id == 0)
+            {
+                //create
+                IsLoading = false;
+            }
+            else
+            {
+                //update
+                Title = "Update";
+                await Load();
+            }
+        }
+
+    }
+
+    private async Task Load()
+    {
+        IsLoading = true;
+        StateHasChanged();
+        Plane = await planeRepository.GetAsync(Id);
+        IsLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task UpsertObj()
+    {
+
+        if (Plane.Id == 0)
+        {
+            //create
+            await planeRepository.CreateAsync(Plane);
+        }
+        else
+        {
+            //update
+            await planeRepository.UpdateAsync(Plane);
+        }
+        navigationManager.NavigateTo("plane");
+    }
+
+
+
+}

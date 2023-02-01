@@ -1,0 +1,99 @@
+﻿@page "/plane"
+@inject IPlaneRepositorie planeRepository
+@inject IJSRuntime jsRuntime
+
+<_DeleteConfirmation IsParentComponentProcessing="IsLoading" ConfirmationChanged="ConfirmDelete_Click"  ></_DeleteConfirmation>
+
+<div class="row mt-4">
+    <div class="col-6">
+        <h4 class="card-title text-primary">Plane List</h4>
+    </div>
+    <div class="col-4 offset-2">
+        <a href="plane/create" class="btn btn-primary form-control">Add New Plane</a>
+    </div>
+</div>
+
+<div class="col-12 p-3">
+    @if (Planes.Any())
+    {
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Seats</th>
+                    <th>Active</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var obj in Planes)
+                {
+                    <tr>
+                        <td>@obj.Name</td>
+                        <td>@obj.Seats</td>
+                        <td>@obj.IsActive</td>
+                        <td>
+                            <NavLink href="@($"plane/edit/{obj.Id}")" class="btn-primary btn">Edit</NavLink>
+                            <button class="btn btn-danger" @onclick="()=>HandleDelete(obj.Id)">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        if (IsLoading)
+        {
+            // loading gif
+            <div class="text-center">
+                <img src="/images/loading.gif" />
+            </div>
+        }
+        else
+        {
+            // no records
+            <p>No records found.</p>
+        }
+    }
+</div>
+
+@code {
+    private IEnumerable<PlaneDTO> Planes { get; set; } = new List<PlaneDTO>();
+    public bool IsLoading { get; set; }
+    private int DeleteId { get; set; } = 0;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Load();
+        }
+    }
+
+    private async Task Load()
+    {
+        IsLoading = true;
+        StateHasChanged();
+        Planes = await planeRepository.GetAllAsync();
+        IsLoading = false;
+        StateHasChanged();
+    }
+
+    private void HandleDelete(int id)
+    {
+        DeleteId = id;
+        jsRuntime.InvokeVoidAsync("ShowDeleteConfirmationModal");
+    }
+
+    public async Task ConfirmDelete_Click(bool isConfirmed)
+    {
+        IsLoading = true;
+        if (isConfirmed && DeleteId != 0)
+        {
+            await planeRepository.RemoveAsync(DeleteId);
+            await Load();
+            await jsRuntime.InvokeVoidAsync("HideDeleteConfirmationModal");
+        }
+        IsLoading = false;
+    }
+}
