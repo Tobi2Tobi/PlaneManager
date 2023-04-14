@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using PM.Data.Entity;
+using System.Runtime.CompilerServices;
 
 namespace PM.Data
 {
@@ -12,7 +13,7 @@ namespace PM.Data
 
         }
         public DbSet<Plane> Plane { get; set; }
-
+        public DbSet<Plane> Planes => Set<Plane>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

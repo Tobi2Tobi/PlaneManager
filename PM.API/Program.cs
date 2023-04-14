@@ -16,6 +16,7 @@ namespace PM.API
 
             // Add services to the container.
             //builder.Services.AddAuthorization();
+            builder.Services.AddControllers();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -26,6 +27,12 @@ namespace PM.API
                 option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddScoped<IPlaneRepositorie, PlaneRepository>();
+            builder.Services.AddCors(options=> options.AddPolicy(name: "PlaneOrigins",
+                policy => 
+                {
+                    policy.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod();
+                }
+                ));
 
             var app = builder.Build();
 
@@ -35,12 +42,12 @@ namespace PM.API
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            app.UseCors("PlaneOrigins");
             app.UseHttpsRedirection();
 
             //app.UseAuthorization();
-
-            app.ConfigurePlaneEndpoints();
+            app.MapControllers();
+            //app.ConfigurePlaneEndpoints();
 
             app.Run();
         }

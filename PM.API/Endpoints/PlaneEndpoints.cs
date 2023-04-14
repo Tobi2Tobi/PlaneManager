@@ -14,8 +14,8 @@ namespace PM.API.Endpoints
         public static void ConfigurePlaneEndpoints(this WebApplication app)
         {
             app.MapGet("/api/plane", GetAllPlane)
-                .WithName("GetPlanes")
-                .Produces<APIResponse>(200);
+                .WithName("GetPlanes");
+                
      
 
             app.MapGet("/api/plane/{id:int}", GetPlane)
