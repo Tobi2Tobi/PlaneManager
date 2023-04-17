@@ -18,30 +18,30 @@ namespace PM.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Plane>>> GetSuperHeroes()
+        public async Task<ActionResult<List<Plane>>> GetPlane()
         {
             return Ok(await _context.Planes.ToListAsync());
         }
 
         [HttpPost]
-        public async Task<ActionResult<List<Plane>>> CreateSuperHero(Plane hero)
+        public async Task<ActionResult<List<Plane>>> CreatePlane(Plane plane)
         {
-            _context.Planes.Add(hero);
+            _context.Planes.Add(plane);
             await _context.SaveChangesAsync();
 
             return Ok(await _context.Planes.ToListAsync());
         }
 
         [HttpPut]
-        public async Task<ActionResult<List<Plane>>> UpdateSuperHero(Plane hero)
+        public async Task<ActionResult<List<Plane>>> UpdatePlane(Plane plane)
         {
-            var dbHero = await _context.Planes.FindAsync(hero.Id);
+            var dbHero = await _context.Planes.FindAsync(plane.Id);
             if (dbHero == null)
-                return BadRequest("Hero not found.");
+                return BadRequest("Plane not found.");
 
-            dbHero.Name = hero.Name;
-            dbHero.Seats = hero.Seats;
-            dbHero.IsActive = hero.IsActive;
+            dbHero.Name = plane.Name;
+            dbHero.Seats = plane.Seats;
+            dbHero.IsActive = plane.IsActive;
 
             await _context.SaveChangesAsync();
 
@@ -49,13 +49,13 @@ namespace PM.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<List<Plane>>> DeleteSuperHero(int id)
+        public async Task<ActionResult<List<Plane>>> DeletePlane(int id)
         {
-            var dbHero = await _context.Planes.FindAsync(id);
-            if (dbHero == null)
-                return BadRequest("Hero not found.");
+            var dbplane = await _context.Planes.FindAsync(id);
+            if (dbplane == null)
+                return BadRequest("Plane not found.");
 
-            _context.Planes.Remove(dbHero);
+            _context.Planes.Remove(dbplane);
             await _context.SaveChangesAsync();
 
             return Ok(await _context.Planes.ToListAsync());
